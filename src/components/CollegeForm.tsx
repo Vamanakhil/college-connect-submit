@@ -3,19 +3,23 @@ import React, { useState } from 'react';
 import { FormHeader } from '@/components/FormHeader';
 import { FacultyFields } from '@/components/FacultyFields';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { CollegeFormData, Faculty } from '@/types';
 import { validateEmail, validatePhone, submitFormData } from '@/utils/formUtils';
 import { useToast } from '@/components/ui/use-toast';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
+import { Plus } from 'lucide-react';
+import { InstitutionInfo } from './form-sections/InstitutionInfo';
+import { PrincipalInfo } from './form-sections/PrincipalInfo';
+import { PocInfo } from './form-sections/PocInfo';
+import { TpoInfo } from './form-sections/TpoInfo';
+import { SubmissionDialog } from './form-sections/SubmissionDialog';
 
 export const CollegeForm: React.FC = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showJsonDialog, setShowJsonDialog] = useState(false);
-  const [submittedData, setSubmittedData] = useState<CollegeFormData | null>(null);
+  const [submittedData, setSubmittedData] = useState<any>(null);
   
   const [formData, setFormData] = useState<CollegeFormData>({
     collegeName: '',
@@ -170,11 +174,11 @@ export const CollegeForm: React.FC = () => {
       const result = await submitFormData(formData);
       
       if (result.success) {
-        setSubmittedData(formData);
+        setSubmittedData(result.data);
         setShowJsonDialog(true);
         toast({
           title: "Success",
-          description: "College details submitted successfully",
+          description: "Institution details submitted successfully",
         });
       } else {
         toast({
@@ -195,209 +199,80 @@ export const CollegeForm: React.FC = () => {
     }
   };
 
+  const addFaculty = () => {
+    const newId = crypto.randomUUID();
+    setFormData({
+      ...formData,
+      faculty: [...formData.faculty, { id: newId, name: '', email: '', phone: '' }]
+    });
+  };
+
   return (
     <>
       <Card className="bg-white shadow-lg border-blue-100">
         <CardContent className="pt-6">
           <FormHeader 
-            title="  Summer of AI Internship" 
-            subtitle="College Sign-up form for SOAI Intiative "
+            title="Summer of AI Internship" 
+            subtitle="Institution Sign-up form for SOAI Initiative"
             logoUrl="https://viswam.ai/_astro/Viswam-logo-orig.CyQLCZHT_2jIQLX.svg"
           />
           
           <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="space-y-6">
-              <h3 className="font-semibold text-lg text-gray-900">College Information</h3>
-              
-              <div className="grid grid-cols-1 gap-y-6 gap-x-4">
-                <div className="space-y-1">
-                  <label htmlFor="collegeName" className="text-sm font-medium text-gray-700">
-                    Name of the College*
-                  </label>
-                  <Input 
-                    id="collegeName"
-                    value={formData.collegeName}
-                    onChange={(e) => handleInputChange('collegeName', e.target.value)}
-                    className={`${formErrors.collegeName ? 'border-red-500' : 'border-gray-300'}`}
-                    placeholder="Enter college name"
-                  />
-                  {formErrors.collegeName && (
-                    <p className="text-sm text-red-500">{formErrors.collegeName}</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-6 gap-x-4">
-                <div className="space-y-1">
-                  <label htmlFor="principalName" className="text-sm font-medium text-gray-700">
-                    Name of the Principal*
-                  </label>
-                  <Input 
-                    id="principalName"
-                    value={formData.principalName}
-                    onChange={(e) => handleInputChange('principalName', e.target.value)}
-                    className={`${formErrors.principalName ? 'border-red-500' : 'border-gray-300'}`}
-                    placeholder="Enter principal's name"
-                  />
-                  {formErrors.principalName && (
-                    <p className="text-sm text-red-500">{formErrors.principalName}</p>
-                  )}
-                </div>
-
-                <div className="space-y-1">
-                  <label htmlFor="principalEmail" className="text-sm font-medium text-gray-700">
-                    Principal's Email*
-                  </label>
-                  <Input 
-                    id="principalEmail"
-                    type="email"
-                    value={formData.principalEmail}
-                    onChange={(e) => handleInputChange('principalEmail', e.target.value)}
-                    className={`${formErrors.principalEmail ? 'border-red-500' : 'border-gray-300'}`}
-                    placeholder="Enter principal's email"
-                  />
-                  {formErrors.principalEmail && (
-                    <p className="text-sm text-red-500">{formErrors.principalEmail}</p>
-                  )}
-                </div>
-
-                <div className="space-y-1">
-                  <label htmlFor="principalPhone" className="text-sm font-medium text-gray-700">
-                    Principal's Phone Number*
-                  </label>
-                  <Input 
-                    id="principalPhone"
-                    type="tel"
-                    value={formData.principalPhone}
-                    onChange={(e) => handleInputChange('principalPhone', e.target.value)}
-                    className={`${formErrors.principalPhone ? 'border-red-500' : 'border-gray-300'}`}
-                    placeholder="10-digit number"
-                    maxLength={10}
-                  />
-                  {formErrors.principalPhone && (
-                    <p className="text-sm text-red-500">{formErrors.principalPhone}</p>
-                  )}
-                </div>
-              </div>
-            </div>
+            <InstitutionInfo 
+              collegeName={formData.collegeName}
+              onChangeCollegeName={(value) => handleInputChange('collegeName', value)}
+              error={formErrors.collegeName}
+            />
 
             <Separator />
 
             <div className="space-y-6">
-              <h3 className="font-semibold text-lg text-gray-900">Point of Contact for SOAI Initiative</h3>
-              
-              <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-3">
-                <div className="space-y-1">
-                  <label htmlFor="pocName" className="text-sm font-medium text-gray-700">
-                    Name*
-                  </label>
-                  <Input 
-                    id="pocName"
-                    value={formData.pocName}
-                    onChange={(e) => handleInputChange('pocName', e.target.value)}
-                    className={`${formErrors.pocName ? 'border-red-500' : 'border-gray-300'}`}
-                    placeholder="Enter POC name"
-                  />
-                  {formErrors.pocName && (
-                    <p className="text-sm text-red-500">{formErrors.pocName}</p>
-                  )}
-                </div>
-
-                <div className="space-y-1">
-                  <label htmlFor="pocEmail" className="text-sm font-medium text-gray-700">
-                    Email*
-                  </label>
-                  <Input 
-                    id="pocEmail"
-                    type="email"
-                    value={formData.pocEmail}
-                    onChange={(e) => handleInputChange('pocEmail', e.target.value)}
-                    className={`${formErrors.pocEmail ? 'border-red-500' : 'border-gray-300'}`}
-                    placeholder="Enter POC email"
-                  />
-                  {formErrors.pocEmail && (
-                    <p className="text-sm text-red-500">{formErrors.pocEmail}</p>
-                  )}
-                </div>
-
-                <div className="space-y-1">
-                  <label htmlFor="pocPhone" className="text-sm font-medium text-gray-700">
-                    Phone Number*
-                  </label>
-                  <Input 
-                    id="pocPhone"
-                    type="tel"
-                    value={formData.pocPhone}
-                    onChange={(e) => handleInputChange('pocPhone', e.target.value)}
-                    className={`${formErrors.pocPhone ? 'border-red-500' : 'border-gray-300'}`}
-                    placeholder="10-digit number"
-                    maxLength={10}
-                  />
-                  {formErrors.pocPhone && (
-                    <p className="text-sm text-red-500">{formErrors.pocPhone}</p>
-                  )}
-                </div>
-              </div>
+              <PrincipalInfo 
+                principalName={formData.principalName}
+                principalEmail={formData.principalEmail}
+                principalPhone={formData.principalPhone}
+                onChangePrincipalName={(value) => handleInputChange('principalName', value)}
+                onChangePrincipalEmail={(value) => handleInputChange('principalEmail', value)}
+                onChangePrincipalPhone={(value) => handleInputChange('principalPhone', value)}
+                errors={{
+                  principalName: formErrors.principalName,
+                  principalEmail: formErrors.principalEmail,
+                  principalPhone: formErrors.principalPhone,
+                }}
+              />
             </div>
 
             <Separator />
 
-            <div className="space-y-6">
-              <h3 className="font-semibold text-lg text-gray-900">Training and Placement Officer</h3>
-              
-              <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-3">
-                <div className="space-y-1">
-                  <label htmlFor="tpoName" className="text-sm font-medium text-gray-700">
-                    Name*
-                  </label>
-                  <Input 
-                    id="tpoName"
-                    value={formData.tpoName}
-                    onChange={(e) => handleInputChange('tpoName', e.target.value)}
-                    className={`${formErrors.tpoName ? 'border-red-500' : 'border-gray-300'}`}
-                    placeholder="Enter TPO name"
-                  />
-                  {formErrors.tpoName && (
-                    <p className="text-sm text-red-500">{formErrors.tpoName}</p>
-                  )}
-                </div>
+            <PocInfo 
+              pocName={formData.pocName}
+              pocEmail={formData.pocEmail}
+              pocPhone={formData.pocPhone}
+              onChangePocName={(value) => handleInputChange('pocName', value)}
+              onChangePocEmail={(value) => handleInputChange('pocEmail', value)}
+              onChangePocPhone={(value) => handleInputChange('pocPhone', value)}
+              errors={{
+                pocName: formErrors.pocName,
+                pocEmail: formErrors.pocEmail,
+                pocPhone: formErrors.pocPhone,
+              }}
+            />
 
-                <div className="space-y-1">
-                  <label htmlFor="tpoEmail" className="text-sm font-medium text-gray-700">
-                    Email*
-                  </label>
-                  <Input 
-                    id="tpoEmail"
-                    type="email"
-                    value={formData.tpoEmail}
-                    onChange={(e) => handleInputChange('tpoEmail', e.target.value)}
-                    className={`${formErrors.tpoEmail ? 'border-red-500' : 'border-gray-300'}`}
-                    placeholder="Enter TPO email"
-                  />
-                  {formErrors.tpoEmail && (
-                    <p className="text-sm text-red-500">{formErrors.tpoEmail}</p>
-                  )}
-                </div>
+            <Separator />
 
-                <div className="space-y-1">
-                  <label htmlFor="tpoPhone" className="text-sm font-medium text-gray-700">
-                    Phone Number*
-                  </label>
-                  <Input 
-                    id="tpoPhone"
-                    type="tel"
-                    value={formData.tpoPhone}
-                    onChange={(e) => handleInputChange('tpoPhone', e.target.value)}
-                    className={`${formErrors.tpoPhone ? 'border-red-500' : 'border-gray-300'}`}
-                    placeholder="10-digit number"
-                    maxLength={10}
-                  />
-                  {formErrors.tpoPhone && (
-                    <p className="text-sm text-red-500">{formErrors.tpoPhone}</p>
-                  )}
-                </div>
-              </div>
-            </div>
+            <TpoInfo 
+              tpoName={formData.tpoName}
+              tpoEmail={formData.tpoEmail}
+              tpoPhone={formData.tpoPhone}
+              onChangeTpoName={(value) => handleInputChange('tpoName', value)}
+              onChangeTpoEmail={(value) => handleInputChange('tpoEmail', value)}
+              onChangeTpoPhone={(value) => handleInputChange('tpoPhone', value)}
+              errors={{
+                tpoName: formErrors.tpoName,
+                tpoEmail: formErrors.tpoEmail,
+                tpoPhone: formErrors.tpoPhone,
+              }}
+            />
 
             <Separator />
 
@@ -408,44 +283,37 @@ export const CollegeForm: React.FC = () => {
               setErrors={setFacultyErrors}
             />
 
+            {formData.faculty.length > 0 && (
+              <div className="flex justify-center mb-6">
+                <Button 
+                  type="button" 
+                  onClick={addFaculty}
+                  variant="outline" 
+                  className="flex items-center text-blue-600 border-blue-600 hover:bg-blue-50 w-full sm:w-auto"
+                >
+                  <Plus size={16} className="mr-1" /> Add Another Faculty Member
+                </Button>
+              </div>
+            )}
+
             <div className="flex justify-center pt-6">
               <Button 
                 type="submit" 
                 className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 text-lg w-full sm:w-auto"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? 'Submitting...' : 'Submit College Details'}
+                {isSubmitting ? 'Submitting...' : 'Submit Institution Details'}
               </Button>
             </div>
           </form>
         </CardContent>
       </Card>
 
-      <Dialog open={showJsonDialog} onOpenChange={setShowJsonDialog}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Submitted College Details</DialogTitle>
-            <DialogDescription>
-              The following JSON data has been submitted:
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="bg-gray-100 p-4 rounded-md overflow-x-auto">
-            <pre className="text-sm whitespace-pre-wrap">
-              {JSON.stringify(submittedData, null, 2)}
-            </pre>
-          </div>
-          
-          <DialogFooter>
-            <Button
-              onClick={() => setShowJsonDialog(false)}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              Close
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <SubmissionDialog 
+        open={showJsonDialog}
+        onOpenChange={setShowJsonDialog}
+        submittedData={submittedData}
+      />
     </>
   );
 };

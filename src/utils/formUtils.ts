@@ -1,5 +1,6 @@
 
 import { CollegeFormData } from "@/types";
+import { transformFormDataToApiFormat } from "./formDataTransformer";
 
 export const validateEmail = (email: string): boolean => {
   const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -13,17 +14,20 @@ export const validatePhone = (phone: string): boolean => {
 
 export const submitFormData = async (formData: CollegeFormData): Promise<{ success: boolean; data?: any; error?: string }> => {
   try {
+    // Transform data to the required API format
+    const apiData = transformFormDataToApiFormat(formData);
+    
     // This is a placeholder for the actual API call
-    console.log("Submitting form data:", JSON.stringify(formData, null, 2));
+    console.log("Submitting form data:", JSON.stringify(apiData, null, 2));
     
     // Simulating an API call
     // In a real application, replace this with your actual API endpoint
-    // const response = await fetch('https://your-noco-db-endpoint.com/api/v1/colleges', {
+    // const response = await fetch('https://your-api-endpoint.com/api/v1/institutions', {
     //   method: 'POST',
     //   headers: {
     //     'Content-Type': 'application/json',
     //   },
-    //   body: JSON.stringify(formData),
+    //   body: JSON.stringify(apiData),
     // });
     
     // if (!response.ok) {
@@ -36,7 +40,7 @@ export const submitFormData = async (formData: CollegeFormData): Promise<{ succe
     // For now, we'll simulate a successful response
     return {
       success: true,
-      data: formData
+      data: apiData
     };
   } catch (error) {
     console.error("Error submitting form:", error);
