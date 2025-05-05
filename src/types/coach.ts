@@ -7,6 +7,7 @@ export interface CoachFormData {
   currentOrganization: string;
   yearsOfExperience: string;
   technicalStrengths: string[];
+  otherTechnicalStrength?: string;
   hasMentoringExperience: boolean;
   willingToTravel: boolean;
   travelScope?: "within-city" | "out-of-city" | "";
