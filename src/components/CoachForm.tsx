@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -21,6 +21,7 @@ import {
 import { submitCoachData } from "@/utils/formUtils";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
+import { SubmissionDialog } from "./form-sections/SubmissionDialog";
 
 // Form validation schema
 const formSchema = z.object({
@@ -39,6 +40,9 @@ const formSchema = z.object({
 });
 
 export const CoachForm = () => {
+  const [submissionData, setSubmissionData] = useState<CoachFormData | null>(null);
+  const [showSubmissionDialog, setShowSubmissionDialog] = useState(false);
+  
   const form = useForm<CoachFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -69,11 +73,20 @@ export const CoachForm = () => {
         travelScope: data.willingToTravel ? data.travelScope : "",
       };
 
+      // Set the submission data and show dialog
+      setSubmissionData(submissionData);
+      setShowSubmissionDialog(true);
+      
       const result = await submitCoachData(submissionData);
       
       if (result.success) {
         toast.success("Form submitted successfully");
-        form.reset();
+        
+        // Reset the form after 5 seconds
+        setTimeout(() => {
+          form.reset();
+          setShowSubmissionDialog(false);
+        }, 5000);
       } else {
         toast.error(`Error submitting form: ${result.error}`);
       }
@@ -89,7 +102,8 @@ export const CoachForm = () => {
         <FormHeader 
           title="AI Coach Application" 
           subtitle="Apply to join our team as an AI Coach" 
-          logoUrl="/placeholder.svg"  
+          logoUrl="https://viswam.ai/_astro/Viswam-logo-orig.CyQLCZHT_2jIQLX.svg"
+          centerAlign={true}
         />
 
         <Form {...form}>
@@ -352,6 +366,15 @@ export const CoachForm = () => {
             </Button>
           </form>
         </Form>
+        
+        {/* Dialog to show submitted data */}
+        {submissionData && (
+          <SubmissionDialog
+            open={showSubmissionDialog}
+            onOpenChange={setShowSubmissionDialog}
+            submittedData={submissionData}
+          />
+        )}
       </CardContent>
     </Card>
   );
