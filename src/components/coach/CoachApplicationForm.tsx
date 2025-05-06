@@ -14,6 +14,7 @@ import { CoachIntroduction } from "./CoachIntroduction";
 import { PersonalInfoSection } from "./PersonalInfoSection";
 import { ProfessionalInfoSection } from "./ProfessionalInfoSection";
 import { ExperienceAvailabilitySection } from "./ExperienceAvailabilitySection";
+import { Form } from "@/components/ui/form";
 
 // Form validation schema
 const formSchema = z.object({
@@ -103,29 +104,31 @@ export const CoachApplicationForm = () => {
             centerAlign={true}
           />
 
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Personal Information */}
-            <PersonalInfoSection form={form} />
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Personal Information */}
+              <PersonalInfoSection form={form} />
 
-            {/* Professional Information */}
-            <ProfessionalInfoSection 
-              form={form} 
-              hasOtherSelected={hasOtherSelected} 
-            />
+              {/* Professional Information */}
+              <ProfessionalInfoSection 
+                form={form} 
+                hasOtherSelected={hasOtherSelected} 
+              />
 
-            {/* Experience & Availability */}
-            <ExperienceAvailabilitySection 
-              form={form} 
-              watchWillingToTravel={watchWillingToTravel} 
-            />
+              {/* Experience & Availability */}
+              <ExperienceAvailabilitySection 
+                form={form} 
+                watchWillingToTravel={watchWillingToTravel} 
+              />
 
-            <Button 
-              type="submit" 
-              className="w-full bg-[#9b87f5] hover:bg-[#7E69AB]"
-            >
-              Submit Application
-            </Button>
-          </form>
+              <Button 
+                type="submit" 
+                className="w-full bg-[#9b87f5] hover:bg-[#7E69AB]"
+              >
+                Submit Application
+              </Button>
+            </form>
+          </Form>
           
           {/* Dialog to show submitted data */}
           {submissionData && (

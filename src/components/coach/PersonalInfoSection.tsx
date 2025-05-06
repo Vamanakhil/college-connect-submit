@@ -10,7 +10,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Form } from "@/components/ui/form";
 
 interface PersonalInfoSectionProps {
   form: UseFormReturn<CoachFormData>;
